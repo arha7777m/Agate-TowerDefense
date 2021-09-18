@@ -1,17 +1,15 @@
-# Agate-EndlessRunner2D
-![image](https://user-images.githubusercontent.com/57084294/133442972-1bc1cec9-be2e-47aa-9bfc-2333bf79601c.png)
+# Agate-TowerDefense
+![image](https://user-images.githubusercontent.com/57084294/133905545-ebfa8d50-17b6-43b1-ad87-3d7995724d95.png)
 
 ### About
-Tugas Chapter 3 - Game Programming, remake game endless runner 2D.
+Tugas Chapter 4 - Game Programming, remake game Tower Defense.
 
 ### Feature 
--Sliding:
-  - Hold right click mouse
-  - Mengurangi kecepatan player
-  
--Rapihin UI
+-Simple Wave System
+
+-More Variant Enemies
 
 ### More
--File .exe terdapat dalam folder "Apk"
+-File .exe terdapat dalam file zip "Apk"
 
 -Kasih bintang jika membantu :D
