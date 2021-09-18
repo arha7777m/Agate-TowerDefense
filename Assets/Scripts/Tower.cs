@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 public class Tower : MonoBehaviour
@@ -31,7 +30,7 @@ public class Tower : MonoBehaviour
 
     public void LockPlacement()
     {
-        transform.position = (Vector2)PlacePosition;
+        transform.position = (Vector2) PlacePosition;
     }
 
     // Mengubah order in layer pada tower yang sedang di drag
@@ -81,6 +80,7 @@ public class Tower : MonoBehaviour
             }
         }
 
+        
         _targetEnemy = nearestEnemy;
     }
 
@@ -124,16 +124,5 @@ public class Tower : MonoBehaviour
         _targetRotation = Quaternion.Euler(new Vector3(0f, 0f, targetAngle - 90f));
 
         _towerHead.transform.rotation = Quaternion.RotateTowards(_towerHead.transform.rotation, _targetRotation, Time.deltaTime * 180f);
-    }
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 }

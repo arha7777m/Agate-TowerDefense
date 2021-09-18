@@ -24,11 +24,15 @@ public class LevelManager : MonoBehaviour
 
     [SerializeField] private int _maxLives = 3;
     [SerializeField] private int _totalEnemy = 15;
+    [SerializeField] private int _totalWave = 3;
+    [SerializeField] private float _cooldown = 3;
 
     [SerializeField] private GameObject _panel;
     [SerializeField] private Text _statusInfo;
     [SerializeField] private Text _livesInfo;
     [SerializeField] private Text _totalEnemyInfo;
+    [SerializeField] private Text _countdownInfo;
+    [SerializeField] private Text _waveInfo;
 
     [SerializeField] private Transform _towerUIParent;
     [SerializeField] private GameObject _towerUIPrefab;
@@ -47,17 +51,26 @@ public class LevelManager : MonoBehaviour
 
     private int _currentLives;
     private int _enemyCounter;
+    private int _waveNow;
     private float _runningSpawnDelay;
+    private float _nextWaveTime;
+    private bool isWaveClear;
 
     private void Start()
     {
+        //Wave pertama saat game dimulai
+        _waveNow = 1;
         SetCurrentLives(_maxLives);
         SetTotalEnemy(_totalEnemy);
+
         InstantiateAllTowerUI();
     }
 
     private void Update()
     {
+        //Masukan nilai wave pada teks
+        _waveInfo.text = "Wave: " + _waveNow;
+
         // Jika menekan tombol R, fungsi restart akan terpanggil
         if (Input.GetKeyDown(KeyCode.R))
         {
@@ -69,16 +82,42 @@ public class LevelManager : MonoBehaviour
             return;
         }
 
+        //Jika wave sudah habis, game selesai
+        if (_totalWave < 1)
+        {
+            SetGameOver(true);
+        }
+            
         // Counter untuk spawn enemy dalam jeda waktu yang ditentukan
         // Time.unscaledDeltaTime adalah deltaTime yang independent, tidak terpengaruh oleh apapun kecuali game object itu sendiri,
         // jadi bisa digunakan sebagai penghitung waktu
         _runningSpawnDelay -= Time.unscaledDeltaTime;
-        if (_runningSpawnDelay <= 0f)
+        if(_runningSpawnDelay <= 0f && !isWaveClear)
         {
             SpawnEnemy();
             _runningSpawnDelay = _spawnDelay;
         }
 
+        //Jika semua musuh habis dalam satu wave, maka cooldown wave akan berjalan
+        if (isWaveClear)
+        {
+            _nextWaveTime -= Time.unscaledDeltaTime;
+            if (_nextWaveTime < 0.1f)
+            {
+                _countdownInfo.text = "GO!";
+            }
+            else
+            {
+                _countdownInfo.text = "Next Wave\n" + _nextWaveTime.ToString("0");
+            }
+            
+            _countdownInfo.gameObject.SetActive(true);
+        }
+        else
+        {
+            _countdownInfo.gameObject.SetActive(false);
+        }
+       
         foreach (Tower tower in _spawnedTowers)
         {
             tower.CheckNearestEnemy(_spawnedEnemies);
@@ -142,7 +181,12 @@ public class LevelManager : MonoBehaviour
             bool isAllEnemyDestroyed = _spawnedEnemies.Find(e => e.gameObject.activeSelf) == null;
             if (isAllEnemyDestroyed)
             {
-                SetGameOver(true);
+                //Jika semua enemy hancur, lanjut wave berikutnya
+                _waveNow++;
+                _totalWave--;
+                isWaveClear = true;
+                _nextWaveTime = _cooldown;
+                StartCoroutine(NextWave(_cooldown + 1));
             }
 
             return;
@@ -169,6 +213,20 @@ public class LevelManager : MonoBehaviour
         newEnemy.SetTargetPosition(_enemyPaths[1].position);
         newEnemy.SetCurrentPathIndex(1);
         newEnemy.gameObject.SetActive(true);
+    }
+
+    IEnumerator NextWave(float cooldown)
+    {
+        yield return new WaitForSeconds(cooldown);
+
+        isWaveClear = false;
+
+        //next wave akan menset jumlah enemy 2x lebih banyak & spawndelay 2x lebih cepeat
+        //dari wave sebelumnya
+        _spawnDelay *= 0.5f;
+        _totalEnemy *= 2;
+
+        SetTotalEnemy(_totalEnemy);
     }
 
     public Bullet GetBulletFromPool(Bullet prefab)
@@ -218,20 +276,20 @@ public class LevelManager : MonoBehaviour
         // Mathf.Max fungsi nya adalah mengambil angka terbesar
         // sehingga _currentLives di sini tidak akan lebih kecil dari 0
         _currentLives = Mathf.Max(currentLives, 0);
-        _livesInfo.text = $"Lives: {_currentLives}";
+        _livesInfo.text = $"Live: {_currentLives}";
     }
 
     public void SetTotalEnemy(int totalEnemy)
     {
         _enemyCounter = totalEnemy;
-        _totalEnemyInfo.text = $"Total Enemy: {Mathf.Max(_enemyCounter, 0)}";
+        _totalEnemyInfo.text = $"Enemy to Spawn: {Mathf.Max(_enemyCounter, 0)}";
     }
 
     public void SetGameOver(bool isWin)
     {
         IsOver = true;
 
-        _statusInfo.text = isWin ? "You Win!" : "You Lose!";
+        _statusInfo.text = isWin ? "You Win!\n Press R For Restart" : "You Lose!\n Press R For Restart";
         _panel.gameObject.SetActive(true);
     }
 
