@@ -10,6 +10,6 @@ Tugas Chapter 4 - Game Programming, remake game Tower Defense.
 -More Variant Enemies
 
 ### More
--File .exe terdapat dalam file zip "Apk"
+-File .exe terdapat dalam file "Apk.zip"
 
 -Kasih bintang jika membantu :D
